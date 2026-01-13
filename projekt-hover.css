@@ -1,0 +1,190 @@
+/* ============================================================
+   PROJECT HOVER SYSTEM (Desktop only)
+   - Image scale + dark gradient + content reveal
+   - H3 + .pfard-projekt to white on hover
+   - Wave-shaped orange band (injected by JS)
+============================================================ */
+
+@media (min-width: 992px) {
+
+  /* Card container */
+  .projekt-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Trigger overlay (optional but recommended) */
+  .link-hover {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    cursor: pointer;
+  }
+
+  /* Image scale */
+  .img-scale {
+    transition: transform .6s cubic-bezier(0.25, 0.1, 0.25, 1),
+                filter .6s ease;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  /* Content reveal */
+  .projekt-item-content {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 2rem 1.5rem;
+
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity .55s cubic-bezier(0.25, 0.1, 0.25, 1),
+                transform .55s cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    z-index: 6;
+  }
+
+  /* Gradient overlay */
+  .projekt-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 55%;
+    background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+    opacity: 0;
+    transition: opacity .55s ease;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  /* Headline and pfard text default transition */
+  .u-h3-invert,
+  .pfard-projekt {
+    transition: color .30s ease;
+  }
+
+  /* ============================
+     HOVER STATE (via class)
+     JS adds .is-hover on .projekt-item
+  ============================ */
+  .projekt-item.is-hover .img-scale {
+    transform: scale(1.08);
+    filter: brightness(0.85);
+  }
+
+  .projekt-item.is-hover .projekt-item-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .projekt-item.is-hover::before {
+    opacity: 1;
+  }
+
+  .projekt-item.is-hover .u-h3-invert,
+  .projekt-item.is-hover .pfard-projekt {
+    color: #fff !important;
+  }
+
+  /* ============================
+     WAVE ORANGE BAND
+     Injected by JS as .hover-band inside .card-projekte-list
+  ============================ */
+  .hover-band {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+
+    /* starts hidden (below) */
+    transform: translateY(110%);
+    transition: transform .55s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  /* band visible on hover */
+  .projekt-item.is-hover .hover-band {
+    transform: translateY(0%);
+  }
+
+  /* the wave shape itself */
+  .hover-band::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    /* wave rises from bottom */
+    bottom: -2px;
+    height: 38%;
+
+    /* 🔥 your orange */
+    background-repeat: no-repeat;
+    background-size: 120% 100%;
+    background-position: 50% 100%;
+
+    /* SVG wave filled with orange (#ff3b1a).
+       You can swap the SVG path later.
+    */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ff3b1a' d='M0,256L80,234.7C160,213,320,171,480,154.7C640,139,800,149,960,154.7C1120,160,1280,160,1360,160L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+    opacity: 0.95;
+  }
+
+  /* optional: a subtle solid fill under the wave */
+  .hover-band::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 0;
+    height: 8%;
+    background: rgba(255,59,26,0.95);
+    opacity: 0.9;
+  }
+
+  /* Floating hover image (JS) */
+  .aniamation-card-hover {
+    position: fixed;
+    top: 0; left: 0;
+    width: 220px;
+    height: 150px;
+    border-radius: 14px;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate3d(0,0,0);
+    filter: saturate(1.05);
+  }
+}
+
+/* ============================================================
+   Disable hover effects on tablet & mobile
+============================================================ */
+@media (max-width: 991px) {
+  .img-scale,
+  .projekt-item-content,
+  .projekt-item::before,
+  .u-h3-invert,
+  .pfard-projekt,
+  .hover-band {
+    transition: none !important;
+  }
+
+  .projekt-item-content {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    position: static !important;
+  }
+
+  .projekt-item::before,
+  .hover-band {
+    display: none !important;
+  }
+
+  .link-hover {
+    pointer-events: none !important;
+  }
+}
