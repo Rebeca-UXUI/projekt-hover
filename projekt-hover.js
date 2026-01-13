@@ -1,73 +1,145 @@
-(() => {
-  document.addEventListener("DOMContentLoaded", () => {
 
-    if (!window.matchMedia("(min-width: 992px)").matches) return;
+document.addEventListener("DOMContentLoaded", function () {
 
-    const hasGSAP = typeof window.gsap !== "undefined";
-    const items = document.querySelectorAll(".projekt-item");
+    const isDesktop = window.matchMedia("(min-width: 992px)").matches;
+    if (!isDesktop) return; // 🛑 NO animaciones fuera de desktop
 
-    items.forEach((card) => {
+    const items = document.querySelectorAll(".projekte-item");
 
-      /* ---------- INJECT WAVE ---------- */
-      const wrapper = card.querySelector(".card-projekte-list");
-      if (wrapper && !wrapper.querySelector(".hover-band")) {
-        const band = document.createElement("div");
-        band.className = "hover-band";
-        wrapper.prepend(band);
-      }
+    items.forEach((item) => {
+        const img = item.querySelector(".u-img-main-list");
+        const src = img ? (img.currentSrc || img.src) : null;
 
-      /* ---------- TRIGGER ---------- */
-      const trigger =
-        card.querySelector(".card-link-wrapp") ||
-        card.querySelector(".card-projekte-list-link") ||
-        card;
-
-      /* ---------- FLOATING IMAGE ---------- */
-      let hoverDiv, follow = false;
-      let mx = 0, my = 0, px = 0, py = 0;
-
-      if (hasGSAP) {
-        hoverDiv = document.createElement("div");
-        hoverDiv.className = "aniamation-card-hover";
+        /* === IMAGEN FLOTANTE === */
+        const hoverDiv = document.createElement("div");
+        hoverDiv.classList.add("aniamation-card-hover");
         document.body.appendChild(hoverDiv);
 
-        const img = card.querySelector("img");
-        if (img) hoverDiv.style.backgroundImage = `url("${img.src}")`;
+        let mx = 0, my = 0, px = 0, py = 0;
+        let follow = false;
 
         gsap.ticker.add(() => {
-          if (!follow) return;
-          px += (mx - px) * 0.18;
-          py += (my - py) * 0.18;
-          gsap.set(hoverDiv, { x: px + 24, y: py });
+            if (!follow) return;
+            px += (mx - px) * 0.18;
+            py += (my - py) * 0.18;
+            gsap.set(hoverDiv, { x: px + 20, y: py });
         });
-      }
 
-      /* ---------- EVENTS ---------- */
-      trigger.addEventListener("mouseenter", (e) => {
-        card.classList.add("is-hover");
+        /* === FRANJA NARANJA === */
+        const wrapper = item.querySelector(".card-projekte-list");
 
-        if (hasGSAP && hoverDiv) {
-          follow = true;
-          mx = e.clientX; my = e.clientY;
-          px = mx; py = my;
-          gsap.set(hoverDiv, { x: mx, y: my });
-          gsap.to(hoverDiv, { opacity: 1, duration: 0.18 });
+        if (wrapper) {
+            const band = document.createElement("div");
+            band.classList.add("hover-band");
+            wrapper.prepend(band);
+
+            item.addEventListener("mouseenter", () => {
+                band.style.transform = "translateY(0%)";
+            });
+
+            item.addEventListener("mouseleave", () => {
+                band.style.transform = "translateY(100%)";
+            });
         }
-      });
 
-      trigger.addEventListener("mousemove", (e) => {
-        mx = e.clientX;
-        my = e.clientY;
-      });
+        /* === ENTER === */
+        item.addEventListener("mouseenter", (e) => {
+            if (src) hoverDiv.style.backgroundImage = `url("${src}")`;
 
-      trigger.addEventListener("mouseleave", () => {
-        card.classList.remove("is-hover");
+            follow = true;
+            mx = e.clientX;
+            my = e.clientY;
+            px = mx;
+            py = my;
 
-        if (hasGSAP && hoverDiv) {
-          follow = false;
-          gsap.to(hoverDiv, { opacity: 0, duration: 0.15 });
-        }
-      });
+            gsap.set(hoverDiv, { x: mx, y: my });
+            gsap.to(hoverDiv, { opacity: 1, duration: 0.18 });
+        });
+
+        /* === MOVE === */
+        item.addEventListener("mousemove", (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+        });
+
+        /* === LEAVE === */
+        item.addEventListener("mouseleave", () => {
+            follow = false;
+            gsap.to(hoverDiv, { opacity: 0, duration: 0.15 });
+        });
+
+        document.addEventListener("mousemove", (e) => {
+            if (!e.target.closest(".projekte-item")) {
+                follow = false;
+                gsap.to(hoverDiv, { opacity: 0, duration: 0.15 });
+            }
+        });
     });
-  });
-})();
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* ---------------------------------------
+       DETECTAR touch / mouse REAL
+    ---------------------------------------- */
+    const isTouchDevice =
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+        navigator.maxTouchPoints > 0;
+
+    const width = window.innerWidth;
+
+    /* ---------------------------------------
+       ELEMENTOS
+    ---------------------------------------- */
+    const wrapList = document.querySelector(".layout-list-desktop");
+    const wrapGrid = document.querySelector(".layout-grid-mobile");
+    const toggleWrapper = document.querySelector(".view-toggle-wrapper");
+    const buttons = document.querySelectorAll(".view-btn");
+
+    /* ---------------------------------------
+       LÓGICA DE DESKTOP REAL
+       SOLO aquí mostramos los botones
+    ---------------------------------------- */
+    if (!isTouchDevice && width >= 1200) {
+
+        // Mostrar botones
+        toggleWrapper.style.display = "block";
+
+        // Mostrar LIST por defecto
+        wrapList.style.display = "block";
+        wrapGrid.style.display = "none";
+
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+
+                buttons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                const view = btn.dataset.view;
+
+                if (view === "list") {
+                    wrapList.style.display = "block";
+                    wrapGrid.style.display = "none";
+                } else {
+                    wrapList.style.display = "none";
+                    wrapGrid.style.display = "block";
+                }
+            });
+        });
+
+        return; // seguimos con animaciones en desktop
+    }
+
+    /* ---------------------------------------
+       SI NO ES DESKTOP CON MOUSE → GRID
+    ---------------------------------------- */
+    wrapList.style.display = "none";
+    wrapGrid.style.display = "block";
+    toggleWrapper.style.display = "none";
+});
+
+
