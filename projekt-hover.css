@@ -1,118 +1,114 @@
 /* ============================================================
-   PROJEKT CARD HOVER — Editorial + Premium
-   Targets:
-   .projekt-item-wrapper
-   .projekt-card-title
-   .tag-item
-   .projekt-card-visual img
+   PROJEKT CARD HOVER — MOTION ONLY
+   No toca layout (no flex/grid/width/position base)
 ============================================================ */
 
 @media (hover: hover) and (pointer: fine) and (min-width: 992px) {
 
-  .projekt-item-wrapper{
-    display:block;
-    position:relative;
-    text-decoration:none;
-  }
-
-  .projekt-card-item{
-    position:relative;
-  }
-
-  /* Visual container */
-  .projekt-card-visual{
-    position:relative;
-    overflow:hidden;
-    border-radius: 18px; /* ajusta */
-  }
-
-  /* Image */
-  .projekt-card-visual img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-
-    transform: scale(1.02);
+  /* Imagen: micro zoom premium */
+  .projekt-card-visual img {
     transition:
-      transform 800ms cubic-bezier(0.25,0.1,0.25,1),
+      transform 800ms cubic-bezier(0.25, 0.1, 0.25, 1),
       filter 650ms ease;
-    will-change: transform;
+    will-change: transform, filter;
+    transform: translateZ(0); /* evita “jitter” */
   }
 
-  /* Title block */
-  .projekt-card-title{
-    transition: transform 550ms cubic-bezier(0.25,0.1,0.25,1);
-    will-change: transform;
+  .projekt-item-wrapper.is-hover .projekt-card-visual img {
+    transform: scale(1.045) translateX(0.6%);
+    filter: saturate(1.03) contrast(1.02);
   }
 
-  /* Eyebrow underline “draw” */
-  .u-text-eyebrow{
-    position:relative;
-    display:inline-block;
+  /* Bloque título: micro lift */
+  .projekt-card-title {
+    transition: transform 550ms cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform;
+    transform: translateZ(0);
   }
-  .u-text-eyebrow::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:-6px;
-    height:2px;
-    width:100%;
+
+  .projekt-item-wrapper.is-hover .projekt-card-title {
+    transform: translateY(-10px);
+  }
+
+  /* Eyebrow underline “draw” sin tocar layout */
+  .u-text-eyebrow {
+    position: relative; /* solo para el ::after, no cambia layout */
+  }
+
+  .u-text-eyebrow::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 2px;
+    width: 100%;
     background: currentColor;
-    opacity: .7;
+    opacity: 0.7;
+
     transform: scaleX(0);
-    transform-origin:left;
-    transition: transform 520ms cubic-bezier(0.25,0.1,0.25,1);
+    transform-origin: left;
+    transition: transform 520ms cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 
-  /* Tags base state (hidden, will stagger via JS) */
-  .tag-item{
-    opacity:0;
+  .projekt-item-wrapper.is-hover .u-text-eyebrow::after {
+    transform: scaleX(1);
+  }
+
+  /* Tags: aparición suave (stagger lo hace el JS con delays) */
+  .tag-item {
+    opacity: 0;
     transform: translateY(10px);
     transition:
-      transform 520ms cubic-bezier(0.25,0.1,0.25,1),
+      transform 520ms cubic-bezier(0.25, 0.1, 0.25, 1),
       opacity 420ms ease;
     will-change: transform, opacity;
   }
 
-  /* Hover state */
-  .projekt-item-wrapper.is-hover .projekt-card-visual img{
-    transform: scale(1.06) translateX(0.8%);
-    filter: saturate(1.03) contrast(1.02);
-  }
-
-  .projekt-item-wrapper.is-hover .projekt-card-title{
-    transform: translateY(-10px);
-  }
-
-  .projekt-item-wrapper.is-hover .u-text-eyebrow::after{
-    transform: scaleX(1);
-  }
-
-  .projekt-item-wrapper.is-hover .tag-item{
-    opacity:1;
+  .projekt-item-wrapper.is-hover .tag-item {
+    opacity: 1;
     transform: translateY(0);
   }
 
-  /* Optional: subtle sheen on image */
-  .projekt-card-visual::after{
-    content:"";
-    position:absolute;
-    inset:-20%;
-    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.22) 50%, transparent 65%);
-    transform: translateX(-25%);
-    opacity: 0;
-    transition: transform 900ms cubic-bezier(0.25,0.1,0.25,1), opacity 450ms ease;
-    pointer-events:none;
+  /* Sheen opcional (no toca layout). Si no lo quieres: bórralo. */
+  .projekt-card-visual {
+    position: relative; /* solo para el ::after */
   }
-  .projekt-item-wrapper.is-hover .projekt-card-visual::after{
+
+  .projekt-card-visual::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+
+    background: linear-gradient(
+      120deg,
+      transparent 35%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 65%
+    );
+
+    opacity: 0;
+    transform: translateX(-28%);
+    transition:
+      transform 900ms cubic-bezier(0.25, 0.1, 0.25, 1),
+      opacity 450ms ease;
+  }
+
+  .projekt-item-wrapper.is-hover .projekt-card-visual::after {
     opacity: 1;
-    transform: translateX(25%);
+    transform: translateX(28%);
   }
 }
 
-/* Touch devices: no hover tricks */
+/* Touch: deja todo visible, sin “hover states” */
 @media (hover: none), (pointer: coarse) {
-  .tag-item{ opacity:1; transform:none; }
-  .u-text-eyebrow::after{ display:none; }
+  .tag-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .u-text-eyebrow::after {
+    display: none !important;
+  }
 }
+
