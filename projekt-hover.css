@@ -1,165 +1,112 @@
-/* ============================================================
-   PROJEKT HOVER LIB
-   - Desktop real: hover + pointer fine + >= 992px
-   - Touch / tablets: grid, sin animaciones
-============================================================ */
-
-/* RESET: por defecto GRID */
-.layout-list-desktop { display: none; }
-.layout-grid-mobile { display: block; }
-
-/* DESKTOP REAL -> LIST */
-@media (hover: hover) and (pointer: fine) and (min-width: 992px) {
-  .layout-list-desktop { display: block !important; }
-  .layout-grid-mobile { display: none !important; }
+/* ===== base ===== */
+.projekt-item-wrapper {
+  position: relative;
+  display: block;
+  text-decoration: none;
 }
 
-/* Tablets/touch -> GRID */
-@media (hover: none), (pointer: coarse) {
-  .layout-list-desktop { display: none !important; }
-  .layout-grid-mobile { display: block !important; }
+.projekt-card-item {
+  position: relative;
 }
 
-/* FIX Webflow link wrapper (si te hacía cosas raras) */
-@media (max-width: 991px) {
-  .card-projekte-list-link {
-    position: relative !important;
-    z-index: 2;
-  }
+/* imagen: que recorte bien */
+.projekt-card-visual {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px; /* ajusta */
 }
 
-/* GRID móvil -> 1 columna */
-@media (max-width: 767px) {
-  .layout-grid-mobile .projekte-grid {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    grid-auto-rows: auto;
-    gap: 2rem;
-  }
-  .layout-grid-mobile .projekte-grid-item { width: 100% !important; }
+/* la imagen dentro */
+.projekt-card-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transform: scale(1.01);
+  transition: transform 700ms cubic-bezier(0.25, 0.1, 0.25, 1),
+              filter 600ms ease;
+  will-change: transform;
 }
 
-/* ============================================================
-   DESKTOP ANIMATIONS
-============================================================ */
-@media (hover: hover) and (pointer: fine) and (min-width: 992px) {
+/* contenido: micro subida */
+.projekt-card-title {
+  position: relative;
+  transition: transform 550ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform;
+}
 
-  .projekte-item {
-    position: relative;
-    overflow: visible;
+/* tags: list ready */
+.tag-list-wrapper {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* tags: estado base */
+.tag-item {
+  transition: transform 500ms cubic-bezier(0.25, 0.1, 0.25, 1),
+              opacity 450ms ease;
+  transform: translateY(10px);
+  opacity: 0.0;
+  will-change: transform, opacity;
+}
+
+/* underline “draw” bajo eyebrow (opcional) */
+.u-text-eyebrow {
+  position: relative;
+  display: inline-block;
+}
+
+.u-text-eyebrow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 520ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  opacity: 0.7;
+}
+
+/* ===== hover ===== */
+@media (hover: hover) and (pointer: fine) {
+
+  .projekt-item-wrapper:hover .projekt-card-visual img {
+    transform: scale(1.045) translateX(0.6%);
+    filter: saturate(1.02) contrast(1.02);
   }
 
-  /* Ocultar contenido fijo al hover (lo que tú ya hacías) */
-  .projekte-item:hover .visual-card-content {
-    opacity: 0 !important;
-    visibility: hidden !important;
+  .projekt-item-wrapper:hover .projekt-card-title {
+    transform: translateY(-10px);
   }
 
-  /* Imagen flotante grande */
-  .aniamation-card-hover {
-    position: fixed;
-    top: 0;
-    left: 0;
+  .projekt-item-wrapper:hover .u-text-eyebrow::after {
+    transform: scaleX(1);
+  }
 
-    width: clamp(320px, 38vw, 720px); /* 🔥 más grande */
-    aspect-ratio: 4 / 3;
+  /* tags appear (CSS-only, no stagger yet) */
+  .projekt-item-wrapper:hover .tag-item {
+    transform: translateY(0);
+    opacity: 1;
+  }
 
-    background-size: cover;
-    background-position: center;
-    border-radius: 1rem;
-
-    opacity: 0;
+  /* si quieres que aparezcan SOLO en hover */
+  .tag-list-wrapper {
     pointer-events: none;
-    z-index: 999999999;
-
-    box-shadow: 0 20px 60px rgba(0,0,0,0.16);
-    border: 1px solid rgba(0,0,0,0.06);
-  }
-
-  /* Card wrapper */
-  .card-projekte-list {
-    position: relative;
-    overflow: hidden;
-    background: white;
-  }
-
-  /* Mantener contenido por encima de la ola */
-  .card-projekte-list > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* ============================
-     OLA NARANJA ORGÁNICA
-     sube y acaba llenando naranja
-  ============================ */
-  .hover-band {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-
-    transform: translateY(110%);
-    transition: transform .60s cubic-bezier(0.25, 0.1, 0.25, 1);
-  }
-
-  .projekte-item.is-hover .hover-band {
-    transform: translateY(0%);
-  }
-
-  /* Onda (arriba) + fill (abajo) */
-  .hover-band::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px;
-    height: 55%;
-
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    background-size: 140% 100%;
-
-    /* SVG wave naranja */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23FF4C15' d='M0,224 C180,180 360,260 540,224 C720,188 900,260 1080,224 C1260,188 1350,150 1440,160 L1440,320 L0,320 Z'/%3E%3C/svg%3E");
-  }
-
-  /* Relleno sólido debajo para que “acabe todo naranja” */
-  .hover-band::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    bottom: 0;
-    height: 100%;
-    background: rgba(255, 76, 21, 0.96);
-    transform: translateY(52%); /* solo se ve parte al inicio */
-    transition: transform .60s cubic-bezier(0.25, 0.1, 0.25, 1);
-  }
-
-  .projekte-item.is-hover .hover-band::after {
-    transform: translateY(0%); /* llena */
-  }
-
-  /* Texto a blanco (h3 + pfard) */
-  .projekte-item h3,
-  .projekte-item .pfard-projekt {
-    transition: color .25s ease;
-  }
-
-  .projekte-item.is-hover h3,
-  .projekte-item.is-hover .pfard-projekt {
-    color: #fff !important;
   }
 }
 
-/* Touch: desactivar totalmente cosas hover */
+/* mobile: sin hover tricks */
 @media (hover: none), (pointer: coarse) {
-  .hover-band,
-  .aniamation-card-hover { display: none !important; }
-  .projekte-item:hover .visual-card-content {
-    opacity: 1 !important;
-    visibility: visible !important;
+  .tag-item {
+    transform: none;
+    opacity: 1;
   }
-  .card-projekte-list { overflow: visible !important; }
+  .u-text-eyebrow::after {
+    display: none;
+  }
 }
-
